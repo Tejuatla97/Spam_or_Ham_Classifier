@@ -1,0 +1,72 @@
+import pandas as pd
+
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+
+# Dataset
+data = {
+    'message': [
+        'Free free free money now',
+        'Win cash prize',
+        'Call me tonight',
+        'Lets go for dinner',
+        'Claim free reward now',
+        'Are you attending class',
+        'Free cash free offer',
+        'Meet me tomorrow'
+    ],
+    'label': [
+        'spam',
+        'spam',
+        'ham',
+        'ham',
+        'spam',
+        'ham',
+        'spam',
+        'ham'
+    ]
+}
+
+# Create DataFrame
+df = pd.DataFrame(data)
+
+print("Training Data:")
+print(df)
+
+# Features and Labels
+X = df['message']
+y = df['label']
+
+# Convert text into numerical features
+vectorizer = CountVectorizer()
+X_vectorized = vectorizer.fit_transform(X)
+
+# Train Model
+model = MultinomialNB()
+model.fit(X_vectorized, y)
+
+print("\nModel Trained Successfully!")
+
+# Prediction Loop
+while True:
+
+    user_message = input("\nEnter a message (or type 'exit' to quit): ")
+
+    if user_message.lower() == "exit":
+        print("Program Ended.")
+        break
+
+    user_vector = vectorizer.transform([user_message])
+
+    prediction = model.predict(user_vector)[0]
+    probability = model.predict_proba(user_vector)[0]
+
+    spam_index = list(model.classes_).index('spam')
+    ham_index = list(model.classes_).index('ham')
+
+    spam_prob = probability[spam_index]
+    ham_prob = probability[ham_index]
+
+    print("\nPrediction:", prediction.upper())
+    print(f"Ham Probability : {ham_prob:.2%}")
+    print(f"Spam Probability: {spam_prob:.2%}")
